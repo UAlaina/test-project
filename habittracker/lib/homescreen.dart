@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _initializeUserData();
     DateCheckService().initialize(
-      interval: const Duration(seconds: 5),
+      interval: const Duration(minutes: 30),
     );
     _initializePages();
   }
