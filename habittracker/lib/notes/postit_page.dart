@@ -55,9 +55,9 @@ class _PostItCanvasPageState extends State<PostItCanvasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Post-It Canvas"),
-      ),
+      // appBar: AppBar(
+      //   title: Text("Post-It Canvas"),
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addStickyNote,
         child: Icon(Icons.add),

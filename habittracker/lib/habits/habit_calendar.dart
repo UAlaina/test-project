@@ -101,9 +101,9 @@ class _HabitCalendarScreenState extends State<HabitCalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        //title: Text('Habit Calendar'),
-      ),
+      // appBar: AppBar(
+      //   //title: Text('Habit Calendar'),
+      // ),
       body: Column(
         children: [
           TableCalendar(

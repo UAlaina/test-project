@@ -90,14 +90,14 @@ class _ListNotesPageState extends State<ListNotesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.grey[800],
-        title: const Text(
-          'Notes List',
-          style: TextStyle(color: Colors.white),
-        ),
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.grey[800],
+      //   title: const Text(
+      //     'Notes List',
+      //     style: TextStyle(color: Colors.white),
+      //   ),
+      //   iconTheme: IconThemeData(color: Colors.white),
+      // ),
       body: _notes.isEmpty
           ? Center(
         child: Text(

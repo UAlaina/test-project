@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habittracker/models/db_service.dart';
 import 'package:habittracker/models/dbHelper.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -48,70 +49,87 @@ class _ReportPageState extends State<ReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: 20),
-          _buildDropdown('Sort by', ['Daily', 'Weekly', 'Monthly']),
-
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _reports == null || _reports!.isEmpty
-                ? Center(
-              child: Column(
-                children: [
-                  SizedBox(height: 100),
-                  Text('No Reports Yet'),
-                ],
-              ),
-            ) :
-            Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: _reports!.length,
-                      itemBuilder: (context, index) {
-                        final report = _reports![index];
-                        return GestureDetector(
-                          onTap: () =>
-                          {
-                            //_navigateToTaskList(habit.id),
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                Text('score ${report.score}'),
-                                Text('startTime ${DateTime.fromMillisecondsSinceEpoch(report.startTime)}'),
-                                Text('startTime ${report.interval}'),
-                              ],
-                            ),
-
-
-                          ),
-                        );
-                      }
-                  ),
+      // appBar: AppBar(
+      //   title: const Text('Progress Reports'),
+      //   // backgroundColor: Colors.teal,
+      //   elevation: 0,
+      // ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildDropdown('Sort by', ['Daily', 'Weekly', 'Monthly']),
+            const SizedBox(height: 16),
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _reports == null || _reports!.isEmpty
+                  ? const Center(
+                child: Text(
+                  'No reports yet.',
+                  style: TextStyle(fontSize: 18),
                 ),
-              ],
+              )
+                  : ListView.builder(
+                itemCount: _reports!.length,
+                itemBuilder: (context, index) {
+                  final report = _reports![index];
+                  final score = report.score.clamp(0.0, 1.0);
+                  final readableTime = DateTime.fromMillisecondsSinceEpoch(
+                      report.startTime);
+
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        CircularPercentIndicator(
+                          radius: 45.0,
+                          lineWidth: 10.0,
+                          percent: score,
+                          center: Text('${(score * 100).round()}%'),
+                          progressColor: Colors.teal,
+                          backgroundColor: Colors.grey[300]!,
+                          animation: true,
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Interval: ${report.interval}',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Start: ${readableTime.toLocal()}',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-
-
     );
   }
 

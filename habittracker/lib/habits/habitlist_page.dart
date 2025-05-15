@@ -278,6 +278,7 @@ class _HabitlistPageState extends State<HabitlistPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(

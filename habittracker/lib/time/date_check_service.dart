@@ -46,32 +46,35 @@ class DateCheckService {
   Future<void> dateCheck(String intervalString) async {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     int interval;
-    DateTime startOf;
+    //DateTime startOf;
 
+    //set interval based on string
     switch (intervalString) {
       case 'Daily':
         interval = 24 * 60 * 60 * 1000; //24hrs
-        startOf = startOfDay(DateTime.now());
+        //startOf = startOfDay(DateTime.now());
         break;
       case 'Weekly':
         interval = 7 * 24 * 60 * 60 * 1000; //7days
-        startOf = startOfWeek(DateTime.now());
+        //startOf = startOfWeek(DateTime.now());
         break;
       case 'Monthly':
         interval = 30 * 24 * 60 * 60 * 1000; //30days
-        startOf = startOfMonth(DateTime.now());
+        //startOf = startOfMonth(DateTime.now());
         break;
       default:
         print('[!Intervalswitch] wrong value (d|w|m)');
         return;
     }
 
+    //get the tasks by interval
     print('[!datecheck] left switch with $interval');
     List<Task>? tasks = await DbService().dbHelper.getTasksByInterval(intervalString);
 
     int completeCount = 0;
     int totalTaskCount = 0;
     int lateTasks = 0;
+    int oldStartTime = 0;
 
     for (var task in tasks) {
       print('[!printtask] $intervalString $task');
@@ -81,7 +84,8 @@ class DateCheckService {
         }
         //update task
         task.completed = 0;
-        task.startTime += interval;
+        oldStartTime = task.startTime;
+        task.startTime += interval; //task.startTime += interval;
         await DbService().dbHelper.updateTask(task);
         lateTasks++;
       }
@@ -97,17 +101,17 @@ class DateCheckService {
       completePercent = 0;
     }
     //generate report
-    await generateReport(completePercent, startOf, intervalString);
+    await generateReport(completePercent, oldStartTime, intervalString);
     //repeat until caught up
     dateCheck(intervalString);
   }
 
-  Future<void> generateReport(double completePercent, DateTime startOf, String intervalString) async {
-    int startTime = startOf.millisecondsSinceEpoch;
+  Future<void> generateReport(double completePercent, int oldStartTime, String intervalString) async {
+    //int startTime = startOf.millisecondsSinceEpoch;
     final report = Report(
       id: 0, //is ignored, should auto increment
       score: completePercent,
-      startTime: startTime,
+      startTime: oldStartTime,
       interval: intervalString,
     );
 
