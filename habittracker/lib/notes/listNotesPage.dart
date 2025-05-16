@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:habittracker/notes/addnotes_page.dart';
+import 'package:habittracker/notes/viewNotes.dart';
 import 'package:provider/provider.dart';
 import 'package:habittracker/models/user_data.dart';
 
@@ -62,10 +63,30 @@ class _NotesListPageState extends State<NotesListPage> {
     });
   }
 
-  void _navigateToAddNotePage() async {
+  Future<void> _deleteNote(String noteId) async {
+    final docId = Provider.of<UserData>(context, listen: false).docId;
+    if (docId == null || docId.isEmpty) return;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(docId)
+          .collection('notes')
+          .doc(noteId)
+          .delete();
+
+      _loadNotes();
+    } catch (e) {
+      print('Error deleting note: $e');
+    }
+  }
+
+  void _navigateToAddNotePage({String? noteId, String? title, String? content}) async {
     final shouldReload = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AddNotePage()),
+      MaterialPageRoute(
+        builder: (context) => AddNotePage(noteId: noteId, initialTitle: title, initialContent: content),
+      ),
     );
 
     if (shouldReload == true) {
@@ -73,10 +94,20 @@ class _NotesListPageState extends State<NotesListPage> {
     }
   }
 
+  void _navigateToViewNotePage(String title, String content) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewNotePage(title: title, content: content),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
@@ -86,13 +117,13 @@ class _NotesListPageState extends State<NotesListPage> {
           ),
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.green,
       ),
       body: _filteredNotes == null || _filteredNotes!.isEmpty
           ? Center(
         child: Text(
           'No notes found',
-          style: TextStyle(color: Colors.teal[700], fontSize: 16),
+          style: TextStyle(color: Colors.green[700], fontSize: 16),
         ),
       )
           : ListView.builder(
@@ -100,55 +131,73 @@ class _NotesListPageState extends State<NotesListPage> {
         itemCount: _filteredNotes!.length,
         itemBuilder: (context, index) {
           final note = _filteredNotes![index];
-          return GestureDetector(
-            onTap: () => print('View note details for: ${note['id']}'),
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 8),
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.teal.withOpacity(0.2),
-                    blurRadius: 6,
-                    offset: Offset(0, 3),
+          return Container(
+            margin: EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withOpacity(0.2),
+                  blurRadius: 6,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  note['title'] ?? 'Untitled',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[800],
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    note['title'] ?? 'Untitled',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal[800],
-                    ),
-                  ),
-                  if (note['content'] != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        note['content'],
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.teal[600],
-                        ),
+                ),
+                if (note['content'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      note['content'],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.green[600],
                       ),
                     ),
-                ],
-              ),
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.visibility, color: Colors.green),
+                      onPressed: () => _navigateToViewNotePage(note['title'], note['content']),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit, color: Colors.green),
+                      onPressed: () => _navigateToAddNotePage(
+                        noteId: note['id'],
+                        title: note['title'],
+                        content: note['content'],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _deleteNote(note['id']),
+                    ),
+                  ],
+                ),
+              ],
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAddNotePage,
-        backgroundColor: Colors.teal,
+        onPressed: () => _navigateToAddNotePage(),
+        backgroundColor: Colors.green,
         child: const Icon(Icons.add),
       ),
     );

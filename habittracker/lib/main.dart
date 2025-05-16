@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:habittracker/notifications/notification_service.dart';
 import 'package:provider/provider.dart';
 
 import 'login/splash_screen.dart';
@@ -7,6 +8,7 @@ import 'models/user_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
   await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: "AIzaSyCs7QYbh0cUdMRuTpnDl-VDmL9GC1HFH48",

@@ -290,6 +290,7 @@ class AddNewHabitsPage extends StatelessWidget {
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:habittracker/models/dbHelper.dart';
 import 'package:habittracker/models/db_service.dart';
 
@@ -304,6 +305,47 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
   final DbHelper dbHelper = DbService().dbHelper;
   final TextEditingController nameController = TextEditingController();
   Map<String, String?> selectedValues = {};
+
+  //NOTIFICATION PART:
+  // late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  //
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _initNotifications();
+  // }
+  //
+  // void _initNotifications() {
+  //   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  //
+  //   const AndroidInitializationSettings initializationSettingsAndroid =
+  //   AndroidInitializationSettings('@mipmap/ic_launcher');
+  //
+  //   const InitializationSettings initializationSettings =
+  //   InitializationSettings(android: initializationSettingsAndroid);
+  //
+  //   flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  // }
+  //
+  // Future<void> _showNotification(String habitName) async {
+  //   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+  //     'habit_reminder_channel',
+  //     'Habit Reminders',
+  //     channelDescription: 'Channel for habit reminders',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //   );
+  //
+  //   const NotificationDetails platformDetails =
+  //   NotificationDetails(android: androidDetails);
+  //
+  //   await flutterLocalNotificationsPlugin.show(
+  //     0, // Notification ID
+  //     'REMINDER',
+  //     habitName,
+  //     platformDetails,
+  //   );
+  // }
 
   Future<void> _addHabit() async {
     if (nameController.text.isEmpty) {
@@ -324,6 +366,9 @@ class _AddNewHabitsPageState extends State<AddNewHabitsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Habit added successfully! 🎉')),
       );
+      //NOTIFICATION PART:
+      //await _showNotification(habit.name);
+
       Navigator.pop(context, true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

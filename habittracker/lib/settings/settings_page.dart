@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:habittracker/notifications/notification_service.dart';
 import 'package:habittracker/settings/ChangePasswordPage.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class SettingsPage extends StatefulWidget {
   final bool isDarkMode;
@@ -17,12 +19,82 @@ class _SettingsPageState extends State<SettingsPage> {
   bool weeklyReminder = false;
 
   @override
+  void initState() {
+    super.initState();
+    NotificationService().init(); // Initialize the notification service
+  }
+
+  void toggleDailyReminder(bool value) async {
+    setState(() {
+      dailyReminder = value;
+    });
+
+    if (value) {
+      // Schedule a daily notification
+      final now = tz.TZDateTime.now(tz.local);
+      final scheduledTime = TimeOfDay(hour: 8, minute: 0); // Set the desired time here
+
+      // Calculate the next occurrence of the time
+      var nextDaily = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        scheduledTime.hour,
+        scheduledTime.minute,
+      );
+
+      if (nextDaily.isBefore(now)) {
+        nextDaily = nextDaily.add(const Duration(days: 1));
+      }
+
+      await NotificationService().scheduleNotification(
+        1, // Unique ID for the notification
+        'Daily Reminder',
+        'It’s time to check your habits!',
+        nextDaily,
+      );
+    } else {
+      // Cancel the daily notification
+      await NotificationService().cancelNotification(1);
+    }
+  }
+
+  void toggleWeeklyReminder(bool value) async {
+    setState(() {
+      weeklyReminder = value;
+    });
+
+    if (value) {
+      // Schedule a weekly notification
+      final now = tz.TZDateTime.now(tz.local);
+      final scheduledTime = TimeOfDay(hour: 9, minute: 0); // Set the desired time here
+
+      // Calculate the next occurrence of the specified day and time
+      final nextWeek = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day + (7 - now.weekday), // Adds days to reach the next same day of the week
+        scheduledTime.hour,
+        scheduledTime.minute,
+      );
+
+      await NotificationService().scheduleNotification(
+        2, // Unique ID for the notification
+        'Weekly Reminder',
+        'Review your weekly habits!',
+        nextWeek,
+      );
+    } else {
+      // Cancel the weekly notification
+      await NotificationService().cancelNotification(2);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   // title: const Text('Settings'),
-      //   // backgroundColor: Colors.pink,
-      // ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -31,11 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
             trailing: Switch(
               value: dailyReminder,
               activeColor: Colors.lightBlue,
-              onChanged: (value) {
-                setState(() {
-                  dailyReminder = value;
-                });
-              },
+              onChanged: toggleDailyReminder,
             ),
           ),
           const Divider(),
@@ -44,11 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
             trailing: Switch(
               value: weeklyReminder,
               activeColor: Colors.lightBlue,
-              onChanged: (value) {
-                setState(() {
-                  weeklyReminder = value;
-                });
-              },
+              onChanged: toggleWeeklyReminder,
             ),
           ),
           const Divider(),
