@@ -98,24 +98,23 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          ListTile(
-            title: const Text('Daily Reminder'),
-            trailing: Switch(
-              value: dailyReminder,
-              activeColor: Colors.lightBlue,
-              onChanged: toggleDailyReminder,
-            ),
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Weekly Reminder'),
-            trailing: Switch(
-              value: weeklyReminder,
-              activeColor: Colors.lightBlue,
-              onChanged: toggleWeeklyReminder,
-            ),
-          ),
-          const Divider(),
+          // ListTile(
+          //   title: const Text('Daily Reminder'),
+          //   trailing: Switch(
+          //     value: dailyReminder,
+          //     activeColor: Colors.lightBlue,
+          //     onChanged: toggleDailyReminder,
+          //   ),
+          // ),
+          // const Divider(),
+          // ListTile(
+          //   title: const Text('Weekly Reminder'),
+          //   trailing: Switch(
+          //     value: weeklyReminder,
+          //     activeColor: Colors.lightBlue,
+          //     onChanged: toggleWeeklyReminder,
+          //   ),
+          // ),
           ListTile(
             title: const Text('Dark Mode'),
             trailing: Switch(

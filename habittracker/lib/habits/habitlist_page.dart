@@ -252,6 +252,20 @@ class _HabitlistPageState extends State<HabitlistPage> {
     });
   }
 
+  Future<void> _deleteHabit(int id) async {
+    try {
+      await DbService().dbHelper.deleteHabit(id);
+      await _loadData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Task deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete task: $e')),
+      );
+    }
+  }
+
   void _navigateToAddHabitPage() async {
     final shouldReload = await Navigator.push(
       context,
@@ -318,28 +332,44 @@ class _HabitlistPageState extends State<HabitlistPage> {
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    habit.name,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal[800],
-                    ),
-                  ),
-                  if (habit.repeatOn != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(
-                        'Repeats: ${habit.repeatOn}',
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        habit.name,
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.teal[600],
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal[800],
                         ),
                       ),
-                    ),
+                      if (habit.repeatOn != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            'Repeats: ${habit.repeatOn}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.teal[600],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  //DELETE BUTTON
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.teal),
+                    onPressed: () async {
+                      await _deleteHabit(habit.id);
+                      setState(() {
+                        _habits!.removeAt(index);
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
