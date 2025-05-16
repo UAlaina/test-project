@@ -48,6 +48,30 @@ class _ReportPageState extends State<ReportPage> {
   }
 
 
+  String _formatReportLabel(String interval, DateTime dateTime) {
+    final localDate = dateTime.toLocal();
+    final formattedDate = "${_monthName(localDate.month)} ${localDate.day}, ${localDate.year}";
+
+    switch (interval.toLowerCase()) {
+      case 'daily':
+        return '$formattedDate';
+      case 'weekly':
+        return 'Week of $formattedDate';
+      case 'monthly':
+        return 'Month of ${_monthName(localDate.month)} ${localDate.year}';
+      default:
+        return 'From $formattedDate';
+    }
+  }
+
+  String _monthName(int month) {
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return monthNames[month - 1];
+  }
+
 
 
   @override
@@ -112,15 +136,18 @@ class _ReportPageState extends State<ReportPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Text(
+                              //   'Interval: ${report.interval}',
+                              //   style: const TextStyle(
+                              //       fontSize: 16, fontWeight: FontWeight.bold),
+                              // ),
+                              // const SizedBox(height: 6),
                               Text(
-                                'Interval: ${report.interval}',
+                                //'Start: ${readableTime.toLocal()}',
+                                _formatReportLabel(report.interval, readableTime),
+                                //style: const TextStyle(fontSize: 14),
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Start: ${readableTime.toLocal()}',
-                                style: const TextStyle(fontSize: 14),
                               ),
                             ],
                           ),
