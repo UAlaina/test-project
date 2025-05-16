@@ -28,6 +28,10 @@ class _ReportPageState extends State<ReportPage> {
     try {
       final loadedReports = await DbService().dbHelper.getReportsByInterval(_selectedInterval);
       print('[!report] interval $_selectedInterval');
+
+      // Sort reports by startTime descending
+      loadedReports.sort((a, b) => b.startTime.compareTo(a.startTime));
+
       setState(() {
         _reports = loadedReports;
         _isLoading = false;

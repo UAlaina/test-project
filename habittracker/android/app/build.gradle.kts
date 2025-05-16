@@ -16,6 +16,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+
+        //TEST
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -32,6 +35,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // TEST ADD THIS: Enable multidex support for handling large number of methods
+        multiDexEnabled = true // NEW LINE
     }
 
     buildTypes {
@@ -40,6 +46,11 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+
+    // TEST ADD THIS: Enable buildConfig generation
+    buildFeatures {
+        buildConfig = true // NEW BLOCK
     }
 }
 
@@ -63,4 +74,8 @@ dependencies {
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
+
+    // TEST ADD THIS: Add desugaring library to support Java 8+ features
+    //coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5") // NEW LINE
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
