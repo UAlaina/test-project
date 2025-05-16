@@ -15,6 +15,8 @@ void main() async {
       appId: "17345865914",
       messagingSenderId: "17345865914",
       projectId: "habittracker-5c882",
+      //storageBucket: "habittracker-5c882.firebasestorage.app",
+      //authDomain: "habittracker-5c882.firebaseapp.com",
     ),
   );
   //runApp(const MyApp());

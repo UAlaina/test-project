@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(
         child: CircularProgressIndicator(),
       )
-          : ProfilePage(userData: _userData!),
+          : ProfilePage(),
     ];
   }
 
@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_pageName),
-        backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.pinkAccent,
+        backgroundColor: _getAppBarColor(_selectedIndex),
       ),
       drawer: Drawer(
         child: Container(
@@ -115,6 +115,27 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: _pages[_selectedIndex],
     );
+  }
+
+  Color _getAppBarColor(int index) {
+    switch (index) {
+      case 0:
+        return Colors.teal;
+      case 1:
+        return Colors.lightBlueAccent;
+      case 2:
+        return Colors.teal;
+      case 3:
+        return Colors.green;
+      case 4:
+        return Colors.deepPurpleAccent;
+      case 5:
+        return Colors.grey;
+      case 6:
+        return Colors.orangeAccent;
+      default:
+        return Colors.teal;
+    }
   }
 
   ListTile _buildDrawerItem(IconData icon, String title, int index) {

@@ -1,76 +1,76 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:habittracker/profile/EditProfilePage.dart';
-import 'package:habittracker/profile/fetchUserDataSomehow.dart';
-import 'package:habittracker/profile/user.dart';
+import 'package:habittracker/models/user_data.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
-  final UserDatas userData;
-
-  const ProfilePage({Key? key, required this.userData}) : super(key: key);
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late UserDatas _userData; // Local state for user data
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String fullName = "";
+  String email = "";
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _userData = widget.userData; // Initialize local state with passed user data
+    _loadUserData();
   }
 
-  void _loadUser() async {
+  Future<void> _loadUserData() async {
     try {
-      UserDatas updatedUser = await fetchUserDataSomehow();
-      setState(() {
-        _userData = updatedUser; // Replace with the updated instance
-      });
+      // Retrieve user document ID from UserData provider
+      String? userId = Provider.of<UserData>(context, listen: false).docId;
+
+      if (userId != null) {
+        final doc = await _firestore.collection('users').doc(userId).get();
+        if (doc.exists) {
+          setState(() {
+            fullName = doc.data()?['fullName'] ?? "N/A";
+            email = doc.data()?['email'] ?? "N/A";
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      // Handle errors (e.g., user not logged in, data fetch failed)
-      print("Error loading user: $e");
+      print("Error fetching user data: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text("Profile"),
-      //   centerTitle: true,
-      // ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Colors.blue,
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Name: ${_userData.name ?? "No name provided"}",
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Email: ${_userData.email ?? "No email provided"}",
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfilePage(),
-                    ),
-                  );
-                  _loadUser(); // Reload user after edit
-                },
-                child: const Text("Edit Profile"),
-              ),
-            ),
+            Text('Full Name: $fullName', style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
+            Text('Email: $email', style: const TextStyle(fontSize: 18)),
           ],
         ),
       ),
