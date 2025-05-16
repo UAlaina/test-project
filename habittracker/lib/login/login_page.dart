@@ -37,9 +37,9 @@ class _LoginPageState extends State<LoginPage> {
         //save docId to Provider
         final docId = userDoc.id;
         Provider.of<UserData>(context, listen: false).setDocId(docId);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('docID: ${docId}')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('docID: ${docId}')),
+        // );
         //EXP WARNING: might not init properly
         await DbService().initialize(docId);
         Navigator.pushReplacement(
