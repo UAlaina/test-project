@@ -15,6 +15,7 @@ class TaskListPage extends StatefulWidget {
 class _TaskListPageState extends State<TaskListPage> {
   final DbHelper dbHelper = DbService().dbHelper;
   List<Task>? _tasks = [];
+  String? _habitName = '';
 
   bool _isLoading = true;
 
@@ -28,8 +29,10 @@ class _TaskListPageState extends State<TaskListPage> {
     try {
       //final loadedTasks = await dbHelper.getTasksById(widget.habitId);
       final loadedTasks = await DbService().dbHelper.getTasksById(widget.habitId);
+      final tempHabitName = await DbService().dbHelper.getHabitById(widget.habitId);
       setState(() {
         _tasks = loadedTasks;
+        _habitName = tempHabitName.name;
         _isLoading = false;
       });
     } catch (e) {
@@ -98,7 +101,7 @@ class _TaskListPageState extends State<TaskListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('HABITNAMEHERE'),
+        title: Text(_habitName!),
       ),
       body: Expanded(
         child: _isLoading
